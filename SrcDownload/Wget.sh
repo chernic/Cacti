@@ -34,7 +34,8 @@ ReadConf()
 FUNC__DIR=`pwd`
 . $FUNC__DIR/Download.sh
 
-
+cd $FUNC__DIR
+[ -d src ] && echo "Exited: directory of source(src)" || mkdir -v src 
 
 cd $FUNC__DIR
 [ -f WgetDBIDBD.conf ] && . WgetDBIDBD.conf
@@ -53,6 +54,11 @@ cd $FUNC__DIR
 
 cd $FUNC__DIR
 [ -f WgetNDOUtils.conf ] && . WgetPlugin.conf
+# 先判断该目录的属性
+[ "$WGET_LINK" != "" ] && cd $FUNC__DIR/src && Files_Download;
+
+cd $FUNC__DIR
+[ -f WgetSNMP.conf ] && . WgetSNMP.conf
 # 先判断该目录的属性
 [ "$WGET_LINK" != "" ] && cd $FUNC__DIR/src && Files_Download;
 
@@ -80,6 +86,11 @@ cd $FUNC__DIR
 
 cd $FUNC__DIR
 [ -f WgetPlugin.conf ] && . WgetPlugin.conf
+# 先判断该目录的属性
+[ "$WGET_LINK" != "" ] && cd $FUNC__DIR/src && Files_Check;
+
+cd $FUNC__DIR
+[ -f WgetSNMP.conf ] && . WgetSNMP.conf
 # 先判断该目录的属性
 [ "$WGET_LINK" != "" ] && cd $FUNC__DIR/src && Files_Check;
 
