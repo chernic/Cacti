@@ -56,10 +56,10 @@ cd $FUNC__DIR
 # 先判断该目录的属性
 [ "$WGET_LINK" != "" ] && cd $FUNC__DIR/src && Files_Download;
 
-cd $FUNC__DIR
-[ -f WgetDoc.conf ] && . WgetDoc.conf
-# 先判断该目录的属性
-[ "$WGET_LINK" != "" ] && cd $FUNC__DIR/src && Files_Download;
+# cd $FUNC__DIR
+# [ -f WgetDoc.conf ] && . WgetDoc.conf
+# # 先判断该目录的属性
+# [ "$WGET_LINK" != "" ] && cd $FUNC__DIR/src && Files_Download;
 
 
 
@@ -83,8 +83,8 @@ cd $FUNC__DIR
 # 先判断该目录的属性
 [ "$WGET_LINK" != "" ] && cd $FUNC__DIR/src && Files_Check;
 
-cd $FUNC__DIR
-[ -f WgetDoc.conf ] && . WgetDoc.conf
-# 先判断该目录的属性
-[ "$WGET_LINK" != "" ] && cd $FUNC__DIR/src && Files_Check;
+# cd $FUNC__DIR
+# [ -f WgetDoc.conf ] && . WgetDoc.conf
+# # 先判断该目录的属性
+# [ "$WGET_LINK" != "" ] && cd $FUNC__DIR/src && Files_Check;
 
