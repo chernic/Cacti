@@ -1,4 +1,4 @@
-`configure' configures Net-SNMP 5.6.2 to adapt to many kinds of systems.
+`configure' configures Net-SNMP 5.7.1 to adapt to many kinds of systems.
 
 Usage: ./configure [OPTION]... [VAR=VALUE]...
 
@@ -12,7 +12,7 @@ Configuration:
       --help=short        display options specific to this package
       --help=recursive    display the short help of all the included packages
   -V, --version           display version information and exit
-  -q, --quiet, --silent   do not print `checking...' messages
+  -q, --quiet, --silent   do not print `checking ...' messages
       --cache-file=FILE   cache test results in FILE [disabled]
   -C, --config-cache      alias for `--cache-file=config.cache'
   -n, --no-create         do not create output files
@@ -116,6 +116,10 @@ Optional Features:
   --enable-local-smux             Restrict SMUX connections to localhost (by default).
   --enable-agentx-dom-sock-only   Disable UDP/TCP transports for agentx.
   --disable-snmptrapd-subagent    Disable agentx subagent code in snmptrapd.
+  --enable-minimalist             Remove all non-essential code features.
+  --enable-notify-only            Build tools that can only send notifications.
+  --enable-no-listen              Build tools that can't listen to ports.
+  --enable-read-only              Remove all SET support from the code.
   --enable-mini-agent             Build a minimal agent.
   --enable-mfd-rewrites           Use new MFD rewrites of mib modules,
                                   where available. (default is to use
@@ -154,6 +158,7 @@ Compiler Options:
 
   --with-pkcs=PATH                Look for pkcs11 in PATH/lib.
   --with-krb5=PATH                Look for krb5 in PATH/lib.
+  --with-dnssec-local-validation Enable local DNSSEC validation using libval (no)
   --without-rpm                   Don't include support for the RPM package
                                   management system when building the host MIB
                                   module.
@@ -163,7 +168,7 @@ Compiler Options:
                                   libraries (eg, HPUX)
   --with-features-of=version
                           Compile in MIB modules and other features as if this
-                          was release "version" (default is 5.6.2).
+                          was release "version" (default is 5.7.1).
 
 Miscellaneous:
   --with-defaults         Use defaults for prompted values.
@@ -229,9 +234,8 @@ Miscellaneous:
     IPX         support for SNMP over IPX per RFC 1420.
                 This transport is presently only available for Linux,
                 is never compiled in by default and may be omitted.
-    DTLSUDP     support for tunneling SNMP over DTLS/UDP
-    TLSTCP      support for tunneling SNMP over TLS/TCP
     SSH         (alpha) support for tunneling SNMP over SSH
+    DTLSUDP     (alpha) support for tunneling SNMP over DTLS/UDP
 
   --with-security-modules="s1 s2 ..."   Compile in the given SNMP security
                                     module services (space separated list).
@@ -239,10 +243,12 @@ Miscellaneous:
   Available SNMP security services:
 
         usm                support for user based SNMP security
-                           (required and always compiled in)
         ksm                support for kerberos based SNMP security
         tsm                support for the Transport-based security
-                           (for use with the SSH, DTLSUDP and TLSTCP transports)
+                           (for use with the SSH and DTLSUDP transports)
+
+  --with-out-security-modules="s1 s2 ..."   Removes the given SNMP security
+                                    module services from the default list.
 
 
 Configuring the agent:
@@ -261,6 +267,10 @@ Configuring the agent:
   --with-sys-location="location"  Default system location.
                                     (Default: Unknown)
   --with-agentx-socket=FILE         AgentX socket (Default: /var/agentx/master as specified in RFC2741)
+  --with-features="feat1 feat2"   Request extra features to be turned on.
+                                   (only useful with --enable-minimalist)
+  --with-out-features="feat1..."  Remove specific features.
+                                   (implies --enable-minimalist)
   --with-mib-modules="item1 ..."  Compile with additional mib modules
                                     (Space separated list).
   --with-out-mib-modules="list"   Compile without these mib modules.
@@ -379,6 +389,8 @@ Network Buffers:
   --with-pic              try to use only PIC/non-PIC objects [default=use
                           both]
   --with-gnu-ld           assume the C compiler uses GNU ld [default=no]
+  --with-sysroot=DIR Search for dependent libraries within DIR
+                        (or the compiler's sysroot if not specified).
 
 Some influential environment variables:
   CC          C compiler command
@@ -386,7 +398,7 @@ Some influential environment variables:
   LDFLAGS     linker flags, e.g. -L<lib dir> if you have libraries in a
               nonstandard directory <lib dir>
   LIBS        libraries to pass to the linker, e.g. -l<library>
-  CPPFLAGS    C/C++/Objective C preprocessor flags, e.g. -I<include dir> if
+  CPPFLAGS    (Objective) C/C++ preprocessor flags, e.g. -I<include dir> if
               you have headers in a nonstandard directory <include dir>
   CPP         C preprocessor
 
