@@ -1,4 +1,4 @@
-`configure' configures Net-SNMP 5.7.2.1 to adapt to many kinds of systems.
+`configure' configures Net-SNMP 5.7.2 to adapt to many kinds of systems.
 
 Usage: ./configure [OPTION]... [VAR=VALUE]...
 
@@ -168,7 +168,7 @@ Compiler Options:
                                   libraries (eg, HPUX)
   --with-features-of=version
                           Compile in MIB modules and other features as if this
-                          was release "version" (default is 5.7.2.1).
+                          was release "version" (default is 5.7.2).
 
 Miscellaneous:
   --with-defaults         Use defaults for prompted values.
