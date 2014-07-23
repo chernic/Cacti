@@ -1,4 +1,4 @@
-`configure' configures Net-SNMP 5.6.2.1 to adapt to many kinds of systems.
+`configure' configures Net-SNMP 5.5.2 to adapt to many kinds of systems.
 
 Usage: ./configure [OPTION]... [VAR=VALUE]...
 
@@ -148,9 +148,7 @@ Compiler Options:
   --with-dmalloc=PATH     Use dmalloc library (www.dmalloc.com)
   --with-efence                   Look for and use libefence (malloc).
   --with-rsaref=PATH              Look for librsaref in PATH/lib.
-  --with-openssl=PATH             Look for openssl in PATH/lib,
-                                  or PATH may be "internal" to build with
-                                  minimal copied OpenSSL code for USM only.
+  --with-openssl=PATH             Look for openssl in PATH/lib.
 
   --with-pkcs=PATH                Look for pkcs11 in PATH/lib.
   --with-krb5=PATH                Look for krb5 in PATH/lib.
@@ -163,7 +161,7 @@ Compiler Options:
                                   libraries (eg, HPUX)
   --with-features-of=version
                           Compile in MIB modules and other features as if this
-                          was release "version" (default is 5.6.2.1).
+                          was release "version" (default is 5.5.2).
 
 Miscellaneous:
   --with-defaults         Use defaults for prompted values.
@@ -229,9 +227,8 @@ Miscellaneous:
     IPX         support for SNMP over IPX per RFC 1420.
                 This transport is presently only available for Linux,
                 is never compiled in by default and may be omitted.
-    DTLSUDP     support for tunneling SNMP over DTLS/UDP
-    TLSTCP      support for tunneling SNMP over TLS/TCP
     SSH         (alpha) support for tunneling SNMP over SSH
+    DTLSUDP     (alpha) support for tunneling SNMP over DTLS/UDP
 
   --with-security-modules="s1 s2 ..."   Compile in the given SNMP security
                                     module services (space separated list).
@@ -242,7 +239,7 @@ Miscellaneous:
                            (required and always compiled in)
         ksm                support for kerberos based SNMP security
         tsm                support for the Transport-based security
-                           (for use with the SSH, DTLSUDP and TLSTCP transports)
+                           (for use with the SSH and DTLSUDP transports)
 
 
 Configuring the agent:
