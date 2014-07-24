@@ -43,7 +43,7 @@ Download_Check()
 	if [ ! -e "${src_url##*/}" ];then
 		echo -e "\033[31m\nFail to download ${src_url##*/}, Please contact the author! \033[0m"
 	else
-		echo -e "\033[32m exists. \033[0m"
+		echo -e "\033[31m exists. \033[0m"
 	fi
 }
 
@@ -73,3 +73,4 @@ Files_Check()
 			 done"
 	done
 }
+
