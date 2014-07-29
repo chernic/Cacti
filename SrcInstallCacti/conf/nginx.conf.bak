@@ -1,0 +1,173 @@
+user www www;
+worker_processes 1;
+
+error_log /home/wwwlogs/error_nginx.log crit;
+pid /var/run/nginx.pid;
+worker_rlimit_nofile 51200;
+
+events {
+	use epoll;
+	worker_connections 51200;
+	}
+
+http {
+	include mime.types;
+	default_type application/octet-stream;
+	server_names_hash_bucket_size 128;
+	client_header_buffer_size 32k;
+	large_client_header_buffers 4 32k;
+	client_max_body_size 8m;
+	sendfile on;
+	tcp_nopush on;
+	keepalive_timeout 120;
+	server_tokens off;
+	tcp_nodelay on;
+
+	proxy_connect_timeout 300s;
+	proxy_send_timeout 900;
+	proxy_read_timeout 900;
+	proxy_buffer_size 32k;
+	proxy_buffers 4 64k;
+	proxy_busy_buffers_size 128k;
+	proxy_redirect off;
+	proxy_hide_header Vary;
+	proxy_set_header Accept-Encoding '';
+	proxy_set_header Host $host;
+	proxy_set_header Referer $http_referer;
+	proxy_set_header Cookie $http_cookie;
+	proxy_set_header X-Real-IP $remote_addr;
+	proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+
+	fastcgi_connect_timeout 300;
+	fastcgi_send_timeout 300;
+	fastcgi_read_timeout 300;
+	fastcgi_buffer_size 64k;
+	fastcgi_buffers 4 64k;
+	fastcgi_busy_buffers_size 128k;
+	fastcgi_temp_file_write_size 128k;
+
+	gzip on;
+	gzip_disable "msie6";
+	gzip_vary on;
+	gzip_comp_level 2;
+	gzip_min_length 1k;
+	gzip_buffers 4 16k;
+	gzip_http_version 1.1;
+	gzip_types text/plain application/x-javascript text/css application/xml;
+
+###################pureftpd AND phpmyadmin############################
+        server {
+        listen 80;
+        server_name _;
+        access_log /home/wwwlogs/access_nginx.log combined;
+        root /home/wwwroot/default;
+        index index.html index.php;
+        if ( $query_string ~* ".*[\;'\<\>].*" ){
+                return 404;
+	        }
+
+	location / {
+		try_files $uri @apache;
+		}
+
+	location @apache {
+		internal;
+		proxy_pass http://127.0.0.1:8080;
+		}
+
+        location ~ .*\.(php|php5)?$  {
+		proxy_pass http://127.0.0.1:8080;
+		}
+
+        location ~ .*\.(gif|jpg|jpeg|png|bmp|swf|flv|ico)$ {
+                expires 30d;
+                }
+
+        location ~ .*\.(js|css)?$ {
+                expires 7d;
+                }
+        }
+
+################http://www.linuxeye.com/nagios#########################
+        server {
+        listen  80;
+        server_name    _;
+        access_log     /dev/null;
+        root /data/admin;
+        index index.php;
+        location ~ .*\.(php|php5)?$  {
+                fastcgi_pass  127.0.0.1:9000;
+                fastcgi_index index.php;
+                include fastcgi.conf;
+                }
+        location ~ .*\.(htm|html|gif|jpg|jpeg|png|bmp|swf|ioc|rar|zip|txt|flv|mid|doc|ppt|pdf|xls|mp3|wma)$ {
+                expires      30d;
+                }
+        location ~ .*\.(js|css)?$ {
+                expires      1h;
+                }
+        location /status {
+                stub_status on;
+                }
+        location ~ .*\.(cgi|pl)?$ {
+                auth_basic "Nagios Access";
+                auth_basic_user_file /usr/local/nagios/etc/htpasswd.users;
+                gzip off;
+                root   /usr/local/nagios/sbin;
+                rewrite ^/nagios/cgi-bin/(.*)\.cgi /$1.cgi break;
+                fastcgi_pass  unix:/usr/local/nginx/logs/perl-fcgi.sock;
+                fastcgi_param SCRIPT_FILENAME /usr/local/nagios/sbin$fastcgi_script_name;
+                fastcgi_index index.cgi;
+                fastcgi_param  REMOTE_USER        $remote_user;
+                fastcgi_param HTTP_ACCEPT_LANGUAGE en_US;
+                include fastcgi_params;
+                fastcgi_read_timeout   60;
+                }
+        }	
+		
+################http://nagios.linuxeye.com##############################
+        server {
+        listen  80;
+        server_name     nagios.linuxeye.com;
+        access_log      logs/nagios_access.log combined;
+        auth_basic "Nagios Access";
+        auth_basic_user_file /usr/local/nagios/etc/htpasswd.users;
+        location / {
+        root   /usr/local/nagios/share;
+        index  index.html index.htm index.php;
+                }
+        location ~ .*\.(php|php5)?$ {
+        root /usr/local/nagios/share;
+        fastcgi_pass  127.0.0.1:9000;
+        fastcgi_index index.php;
+        include fastcgi.conf;
+                }
+        location /nagios {
+            alias /usr/local/nagios/share;
+                }
+        location /cgi-bin/images {
+            alias /usr/local/nagios/share/images;
+                }
+        location /cgi-bin/stylesheets {
+            alias /usr/local/nagios/share/stylesheets;
+                }
+        location /cgi-bin {
+            alias /usr/local/nagios/sbin;
+                }
+        location ~ .*\.(cgi|pl)?$ {
+        gzip off;
+        root   /usr/local/nagios/sbin;
+        rewrite ^/nagios/cgi-bin/(.*)\.cgi /$1.cgi break;
+        fastcgi_pass  unix:/usr/local/nginx/logs/nginx-fcgi.sock;
+        fastcgi_param SCRIPT_FILENAME /usr/local/nagios/sbin$fastcgi_script_name;
+        fastcgi_index index.cgi;
+        fastcgi_param  REMOTE_USER        $remote_user;
+        fastcgi_param HTTP_ACCEPT_LANGUAGE en_US;
+        include fastcgi_params;
+        fastcgi_read_timeout   60;
+                }
+        }
+		
+##########################vhost#####################################
+	include vhost/*.conf;
+}
