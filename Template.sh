@@ -2,7 +2,7 @@
 #####################################################
 # Template
 #####################################################
-# Version : 0.0.6
+# Version : 0.0.7
 # Make by Chernic.Y.Chen @ China
 # E-Mail : iamchernic@gmail.com
 # Date : 2014-7-22
@@ -29,10 +29,20 @@ GetIPAddress()
 
 ReadConf()
 {
-	# [获取本文件路径中 的 文件名称] 即本文件名的配置文件
+	# 获取脚本同名配置
 	CONF_FILE=$(basename $0 .sh).conf
-	# 判断对应文件是否存在,若存在则导入
+	# 加载日志函数
 	[ -f $CONF_FILE ] && . $CONF_FILE
+}
+
+ReadLogf()
+{
+	if [ -z $LOG_IS_NEEDED ]; then
+	# 日志脚本实际路径
+	  LOCAL_PATH=$(dirname "$0");
+	# 加载日志函数
+	  source "${LOCAL_PATH}/log.sh";
+	fi
 }
 ############### Template Version 0.0.6 ##############
 
@@ -41,3 +51,4 @@ ReadConf()
 # v0.0.4(2014-7-22) : Add Debug Flag
 # v0.0.5(2014-7-22) : Add ReadConf()
 # v0.0.6(2014-7-24) : Add GetIPAddress()
+# v0.0.7(2014-7-28) : Add ReadLogf()
