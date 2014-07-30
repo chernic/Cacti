@@ -2,24 +2,25 @@
 #####################################################
 # Template
 #####################################################
-# Version : 0.0.7
+# Version : 0.0.9
 # Make by Chernic.Y.Chen @ China
 # E-Mail : iamchernic@gmail.com
 # Date : 2014-7-22
 export PS4='+[$LINENO]'
-AUTO_FLAG_yn="n"
+
 BreakPoint()
 {
-	while [ "$AUTO_FLAG_yn" != "y" ]
+	while [ "y" != "$AUTO_FLAG_yn" ]
 	do
-		read -p "Do you Make Sure to Continue? [y/n/q] " AUTO_FLAG_yn;
+		read -p "\033[33mDo you Make Sure to Continue? [y/n/q] \033[0m" AUTO_FLAG_yn;
 		[ "$AUTO_FLAG_yn" == "q" ] && exit 0;
 	done
+	AUTO_FLAG_yn="n"
 }
 
 NotRootOut()
 {
-	[ $(id -u) != "0" ] && echo "Error: You must be root to run this script" && exit 1 
+	[ "0" != "$(id -u)" ] && echo "Error: You must be root to run this script" && exit 1 
 }
 
 GetIPAddress()
@@ -44,7 +45,7 @@ ReadLogf()
 	  source "${LOCAL_PATH}/log.sh";
 	fi
 }
-############### Template Version 0.0.6 ##############
+############### Template Version 0.0.9 ##############
 
 # v0.0.2(2014-7-22) : Add NotRootOut()
 # v0.0.3(2014-7-22) : Add BreakPoint()
@@ -52,3 +53,5 @@ ReadLogf()
 # v0.0.5(2014-7-22) : Add ReadConf()
 # v0.0.6(2014-7-24) : Add GetIPAddress()
 # v0.0.7(2014-7-28) : Add ReadLogf()
+# v0.0.8(2014-7-30) : More ColorFul Now.
+# v0.0.9(2014-7-30) : CommonFirst And BreakPoint Debuged.
