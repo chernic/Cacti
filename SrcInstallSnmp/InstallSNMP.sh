@@ -92,20 +92,19 @@ YumInstallNETSNMP()
 
 			# /usr/local/net-snmp/sbin/snmpd -c /usr/local/net-snmp/share/snmp/snmpd.conf &
 			# PATH=/usr/local/net-snmp/bin:/usr/local/net-snmp/sbin:$PATH
-			
 				;;
 		 rpm) 
 			echo "Install SNMP Use rpm."
 			cd $PRO_DIR/RpmDownlaod/rpm
-			   ;;
+				;;
 		 yum)
 			echo "Install SNMP Use yum."
 			yum -y install net-snmpd*
-			   ;;
+				;;
 		 *)
 			echo "Input Install Method."
 			exit 1
-			   ;;
+				;;
 	esac            
 }
 YumInstallNETSNMP;
