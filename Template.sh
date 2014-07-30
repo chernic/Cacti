@@ -33,7 +33,12 @@ ReadConf()
 	# 获取脚本同名配置
 	CONF_FILE=$(basename $0 .sh).conf
 	# 加载日志函数
-	[ -f $CONF_FILE ] && . $CONF_FILE
+	if [ -f $CONF_FILE ];then
+		. $CONF_FILE
+		echo -e "Configure is \033[32mFound.\033[0m"
+	else
+		echo -e "Configure is \033[32mNot Found.\033[0m"
+	fi
 }
 
 ReadLogf()
@@ -55,3 +60,4 @@ ReadLogf()
 # v0.0.7(2014-7-28) : Add ReadLogf()
 # v0.0.8(2014-7-30) : More ColorFul Now.
 # v0.0.9(2014-7-30) : CommonFirst And BreakPoint Debuged.
+# v0.0.10(2014-7-30) : ReadConf() Add Check info
