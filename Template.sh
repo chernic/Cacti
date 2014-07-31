@@ -1,11 +1,4 @@
-#!/bin/bash
-#####################################################
-# Template
-#####################################################
-# Version : 0.0.11
-# Make by Chernic.Y.Chen @ China
-# E-Mail : iamchernic@gmail.com
-# Date : 2014-7-22
+#!/bin/sh
 export PS4='+[$LINENO]'
 
 BreakPoint()
@@ -56,8 +49,15 @@ ReadConf
 ReadLogf;
 LOG_INFO "Load Configure Done.\n"
 
-############### Template Version 0.0.11 ##############
-
+############### Template Version 0.1.0 ##############
+#####################################################
+# Template
+#####################################################
+# Version : 0.0.11
+# Make by Chernic.Y.Chen @ China
+# E-Mail : iamchernic@gmail.com
+# Date : 2014-7-22
+# v0.0.1(2014-7-22) : File Created
 # v0.0.2(2014-7-22) : Add NotRootOut()
 # v0.0.3(2014-7-22) : Add BreakPoint()
 # v0.0.4(2014-7-22) : Add Debug Flag
@@ -67,4 +67,4 @@ LOG_INFO "Load Configure Done.\n"
 # v0.0.8(2014-7-30) : More ColorFul Now.
 # v0.0.9(2014-7-30) : CommonFirst And BreakPoint Debuged.
 # v0.0.10(2014-7-30) : ReadConf() Add Check info
-# v0.0.11(2014-7-31) : Add Function Run Template.
+# v0.1.0(2014-7-31) : Template Update to V0.1
