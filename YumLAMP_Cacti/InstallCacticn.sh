@@ -27,7 +27,7 @@ ReadConf()
 	CONF_FILE=$(basename $0 .sh).conf
 	# 加载日志函数
 	if [ -f $CONF_FILE ];then
-		. $CONF_FILE
+		source $CONF_FILE
 		echo -e "Configure is \033[32mFound.\033[0m"
 	else
 		echo -e "Configure is \033[32mNot Found.\033[0m"
@@ -61,18 +61,18 @@ LOG_INFO "Load Configure Done.\n"
 # v0.1.0(2014-7-31) : Test SucessFull On VisualMachine
 
 LOG_INFO "Initial Variables enoD"
-	MYSQL_PATH="$(dirname `which mysql`)"
-	mysqlrootpwd="focustar"
+	MYSQL_PATH="$(dirname `which mysql`)"# httpd 主目录名称( MySQL部署时决定 )
+	mysqlrootpwd="focustar"              # MySQL 根用户密码( MySQL部署时决定 )
+	PHP_PATH="$(dirname `which php`)"    # PHP   主目录名称( PHP  部署时决定 )
 
-	PHP_PATH="$(dirname `which php`)"
-
-	CACTI_LINK=/var/www/html/cacticn    # 链接后面不带 "/"
-	CACTI_PATH=/var/www
-	CACTI_VSIN="cacti-0.8.7e-cn-utf8" # 压缩文件名
-	CACTI_DBTY="mysql"   # 数据库类型
-	CACTI_DABS="cacticn" # 数据库名称
-	CACTI_NAME="cacticn" # 访问用户名
-	CACTI_PSWD="cacticn" # 用户的密码
+	CACTI_LINK=/var/www/html/cacticn  # httpd 站点主目录( httpd部署时决定, 末尾不带 "/" )
+	CACTI_PATH=/var/www               # Cacti 主目录名称( 可更改, 末尾不带 "/" )
+	CACTI_VSIN="cacti-0.8.7e-cn-utf8" # Cacti 压缩文件名( 暂时只支持该版本)
+	CACTI_DBTY="mysql"                # Cacti 数据库类型( 暂时只支持MySQL )
+	CACTI_DABS="cacticn"              # Cacti 数据库名称( 可更改, 未测试 )
+	CACTI_NAME="cacticn"              # Cacti 访问用户名( 可更改, 未测试 )
+	CACTI_PSWD="cacticn"              # Cacti 用户的密码( 可更改, 未测试 )
+	CACTI_UFT8="utf8"                 # Cacti 数据库字符类型( uft8 <推荐> 或者 gd2312 或 Others)
 LOG_INFO "Initial Variables Done\n"
 
 
@@ -97,11 +97,13 @@ view system included  .iso.org.dod.internet.mgmt.mib-2.system
 access MyROSystem ""     any       noauth    exact  system none   none
 access MyROGroup ""      any       noauth    exact  all    none   none
 access MyRWGroup ""      any       noauth    exact  all    all    none
-syslocation www.chernic.com (configure /etc/snmp/snmpd.local.conf)
+syslocation www.focustar.net
 syscontact iamchernic@gmail.com
 smuxpeer .1.3.6.1.4.1.674.10892.1
 EOF
 fi
+# service snmpd start
+# chkconfig snmpd on
 LOG_INFO "Install NET-SNMP for Cacti Done\n"
 
 
@@ -111,6 +113,7 @@ LOG_INFO "Install rrdtool for Cacti enoD"
 	#./configure --prefix=/usr/local/rrdtool --disable-python --disable-tcl
 	# make
 	# make install
+	
 	# Options : rrdtool-{devel,doc,perl,php,python,ruby,tcl}
 	# 指定安装rrdtool-1.2.27版本，以免和1.2.30冲突
 	yum install rrdtool-1.2.27* rrdtool-php-1.2.27* rrdtool-devel-1.2.27* rrdtool-doc-1.2.27
@@ -118,20 +121,20 @@ LOG_INFO "Install rrdtool for Cacti Done\n"
 
 
 LOG_INFO "TarLink CactiFile to WWW_DIR enoD"
-	if [ -d "$CACTI_PATH/$CACTI_VSIN"  ]; then
-		LOG_WARN "PATH <$CACTI_PATH/$CACTI_VSIN> Existed, Delete it. "
-		rm -rf "$CACTI_PATH/cacti-0.8.7e-cn-utf8"
-	fi
-	tar xzf $CACTI_VSIN.tar.gz
-	mv $CACTI_VSIN "$CACTI_PATH/$CACTI_VSIN"
+	cd $LOCAL_PATH
+		if [ -d "$CACTI_PATH/$CACTI_VSIN"  ]; then
+			LOG_WARN "PATH <$CACTI_PATH/$CACTI_VSIN> Existed, Delete it. "
+			rm -rf "$CACTI_PATH/cacti-0.8.7e-cn-utf8"
+		fi
+		tar xzf $CACTI_VSIN.tar.gz
+		mv $CACTI_VSIN "$CACTI_PATH/$CACTI_VSIN"
 
-	
-	
-	if [ -L $CACTI_LINK ]; then
-		LOG_WARN "Link <$CACTI_LINK> Existed, Delete it. "
-		rm -vf $CACTI_LINK
-	fi
-	ln -sf "$CACTI_PATH/$CACTI_VSIN" "$CACTI_LINK"
+		if [ -L $CACTI_LINK ]; then
+			LOG_WARN "Link <$CACTI_LINK> Existed, Delete it. "
+			rm -vf $CACTI_LINK
+		fi
+		ln -sf "$CACTI_PATH/$CACTI_VSIN" "$CACTI_LINK"
+	cd $LOCAL_PATH
 LOG_INFO "TarLink CactiFile to WWW_DIR Done\n"
 
 
@@ -146,7 +149,7 @@ LOG_INFO "Add User  Done\n"
 
 LOG_INFO "Create DataBase Cacti of MySQL enoD"
 	$MYSQL_PATH/mysql -uroot -p$mysqlrootpwd -e "drop database "$CACTI_DABS";"
-	$MYSQL_PATH/mysql -uroot -p$mysqlrootpwd -e "create database "$CACTI_DABS";"
+	$MYSQL_PATH/mysql -uroot -p$mysqlrootpwd -e "create database "$CACTI_DABS" default character set utf8;"
 	$MYSQL_PATH/mysql -uroot -p$mysqlrootpwd -e "grant all on "$CACTI_DABS".* to root@localhost;"
 	$MYSQL_PATH/mysql -uroot -p$mysqlrootpwd -e "grant all on "$CACTI_DABS".* to root@127.0.0.1;"
 	$MYSQL_PATH/mysql -uroot -p$mysqlrootpwd -e "grant all on "$CACTI_DABS".* to "$CACTI_NAME"@localhost identified by '"$CACTI_PSWD"';"
@@ -156,8 +159,8 @@ LOG_INFO "Create DataBase Cacti of MySQL Done\n"
 
 
 LOG_INFO "Import Cacti Data to MySQL enoD"
-	# 当我们导入数据的时候可能会出错，
-	# 有可能是因为我们安装的mysql是高版本的，
+	# 当我们导入数据的时候可能会出错
+	# 有可能是因为我们安装的mysql是高版本的
 	# 并不支持TYPE=MyISAM,需要改成ENGINE=MyISAM这样就好了
 	sed -i 's@TYPE=MyISAM@@g' $CACTI_LINK/cacti.sql
 	$MYSQL_PATH/mysql -uroot -p$mysqlrootpwd $CACTI_DABS < $CACTI_LINK/cacti.sql
@@ -187,14 +190,26 @@ LOG_INFO "Edited config.php/global.php in Cacti enoD"
 LOG_INFO "Edited global.php in Cacti Done\n"
 
 
-# # # For PHP 5.3
-# # sed -i 's@=&@=@g' $CACTI_LINK/lib/adodb/adodb.inc.php
-
-
 LOG_INFO "Chown Right Of log And rra enoD"
 	# 赋予权限给rra/ log/
 	chown -vR $CACTI_NAME:$CACTI_NAME $CACTI_LINK/{rra,log}
 LOG_INFO "Chown Right Of log And rra Done\n"
+	
+	
+LOG_INFO "Install Character enoD"
+	if [ ! -f /usr/share/fonts/ukai.ttc ];then
+		cd $LOCAL_PATH
+			wget -Nc http://us.archive.ubuntu.com/ubuntu/pool/main/t/ttf-arphic-ukai/ttf-arphic-ukai_0.2.20080216.1.orig.tar.gz
+			#只解压出所需字库文件
+			tar -zxf ttf-arphic-ukai_0.2.20080216.1.orig.tar.gz ukai.ttc
+			cp ukai.ttc /usr/share/fonts/ukai.ttc 
+		cd $LOCAL_PATH
+	fi
+LOG_INFO "Install Character Done\n"
+
+
+# # For PHP 5.3
+# sed -i 's@=&@=@g' $CACTI_LINK/lib/adodb/adodb.inc.php
 
 
 LOG_INFO "Add Crond enoD"
@@ -220,6 +235,10 @@ LOG_INFO "Configure FireWall enoD"
 	elif [ "disabled" == "$FIRE_WALL" ];then
 		service iptables stop
 	else
-		LOG_WARN "Switch of <Firewall> hasn't been set."
+		LOG_WARN "Switch of <Firewall> hasn't been set yet."
 	fi
 LOG_INFO "Configure FireWall enoD\n"
+
+# [ $? -eq 0 ] && echo -e "\n\tNow Cacti is ready to be used via: http://localhost/cacti The default login and password are admin." && echo -e "\tCacti will check if all the required tools are correctly installed.\n"
+
+# echo "" > /usr/share/cacti/cacti_clients
