@@ -59,16 +59,22 @@ LOG_INFO "Load Configure Done.\n"
 # Date : 2014-7-30
 # v0.0.1(2014-7-30) : File Created
 
-LOG_INFO "YunInfo Environment enoD"
-	# List Repos
-	yum repolist
-	# Info httpd
-	yum info httpd
-	# Info mysql
-	yum info mysql
-	# Info php
-	yum info php
-LOG_INFO "YunInfo Environment Done.\n"
+
+LOG_INFO "Environment enoD"
+	LOG_INFO "YunInfo Environment enoD"
+		yum repolist
+		yum info httpd nginx mysql php 
+	LOG_INFO "Stop Server enoD"
+		service nginx stop
+		service httpd stop
+	LOG_INFO "Kill Process enoD"
+		# netstat -lnp|grep 80
+		ps -aux|grep http
+		ps -aux|grep apache
+	LOG_INFO "List Chkconfig enoD"
+		chkconfig --list nginx && chkconfig --del nginx
+		chkconfig --list httpd && chkconfig --del httpd
+LOG_INFO "Environment Done.\n"
 
 
 LOG_INFO "install apache & php enoD"
@@ -90,7 +96,11 @@ LOG_INFO "install apache & php Done\n"
 
 LOG_INFO "Copy Files enoD"
 	cp ./wwwroot/* /var/www/html/
+	
+	
+    sed -i 's@^#ServerName.*@ServerName www.focustarmotor.com:80@g' /etc/httpd/conf/httpd.conf
 LOG_INFO "Copy Files Done\n"
+
 
 LOG_INFO "Restart Server enoD"
 	LOG_INFO "Restart mysql:"
@@ -122,4 +132,4 @@ LOG_INFO "Configure FireWall enoD"
 	else
 		LOG_WARN "Switch of <Firewall> hasn't been set."
 	fi
-LOG_INFO "Configure FireWall enoD"
+LOG_INFO "Configure FireWall Done\n"
