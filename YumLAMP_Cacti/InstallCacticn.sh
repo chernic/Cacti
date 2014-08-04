@@ -128,8 +128,6 @@ syscontact iamchernic@gmail.com
 smuxpeer .1.3.6.1.4.1.674.10892.1
 EOF
 fi
-# service snmpd start
-# chkconfig snmpd on
 LOG_INFO "Install NET-SNMP for Cacti Done\n"
 
 
@@ -216,9 +214,22 @@ LOG_INFO "Edited config.php/global.php in Cacti enoD"
 LOG_INFO "Edited global.php in Cacti Done\n"
 
 
+ChangePHP()
+{
+	FILE=$1     # "$PHP_DIR/global_settings.php"
+	BEGIN=$2    # "path_rrdtool_default_font"
+	ENDIN=$3    # "max_length"
+	CONTENT=$4  # "/usr/share/fonts/ukai.ttc"
+		# 定位 path_rrdtool_default_font 段到 max_length 段的字符串
+		ss=$(grep -n $BEGIN $FILE | cut -d ':' -f 1)
+		# 重复 max_length 段的格式
+		sed -i $ss',/'$ENDIN'/ s/^.*'$ENDIN'.*$/&\n&/' $FILE
+		# 修改 新增的 max_length 段
+		sed -i $ss',/'$ENDIN'/ s:"'$ENDIN'.*$:"default" => "'$CONTENT'",:' $FILE
+}
 LOG_INFO "Edited config.php/global.php in Cacti enoD"
 	sed -i 's@"default" => "Version 1",@"default" => "版本 2",@g' $CACTI_LINK/include/global_settings.php
-	#sed -i 's@"default" => "Version 1",@"default" => "版本 2",@g' ./include/global_settings.php
+	ChangePHP "$CACTI_LINK/include/global_settings.php"  "path_rrdtool_default_font"  "max_length"  "$TRUETYPE_PATH"
 LOG_INFO "Edited global.php in Cacti Done\n"
 
 
@@ -247,7 +258,7 @@ LOG_INFO "Install Character Done\n"
 
 
 LOG_INFO "Add Crond enoD"
-    # 检索/stc/crontab, 若不存在 "本次新规则" 才添加
+    # 检索/etc/crontab, 若不存在 "本次新规则" 才添加
     if [ "" == "`grep "$CACTI_NAME $PHP_PATH/php $CACTI_LINK/poller.php > $CACTI_LINK/log/pooler-error.log" /etc/crontab`" ];then
         echo "*/5 * * * * $CACTI_NAME $PHP_PATH/php $CACTI_LINK/poller.php > $CACTI_LINK/log/pooler-error.log" >> /etc/crontab
     fi
@@ -274,6 +285,14 @@ LOG_INFO "Configure FireWall enoD"
         LOG_WARN "Switch of <Firewall> hasn't been set yet."
     fi
 LOG_INFO "Configure FireWall enoD\n"
+LOG_INFO "Auto Start enoD"
+    if [ "enabled" == "$CHK_CONFIG" ];then
+		chkconfig httpd on
+		chkconfig snmpd on
+		chkconfig crond on
+	fi
+LOG_INFO "Auto Start enoD"
+
 
 # [ $? -eq 0 ] && echo -e "\n\tNow Cacti is ready to be used via: http://localhost/cacti The default login and password are admin." && echo -e "\tCacti will check if all the required tools are correctly installed.\n"
 
