@@ -23,74 +23,38 @@ GetIPAddress()
 
 ReadConf()
 {
+    # 全局配置实际路径
+		LOCAL_PATH=$(dirname "$0");
     # 获取脚本同名配置
-    CONF_FILE=$(basename $0 .sh).conf
+		CONF_FILE="$1"
     # 加载日志函数
-    if [ -f $CONF_FILE ];then
-        source $CONF_FILE
-        echo -e "Configure is \033[32mFound.\033[0m"
+    if [ -f $LOCAL_PATH/$CONF_FILE ];then
+        echo -e "$CONF_FILE is \033[32mFound.\033[0m"
+        source $LOCAL_PATH/$CONF_FILE
     else
-        echo -e "Configure is \033[32mNot Found.\033[0m"
-    fi
-}
-
-ReadLogf()
-{
-    if [ -z $LOG_IS_NEEDED ]; then
-    # 日志脚本实际路径
-      LOCAL_PATH=$(dirname "$0");
-    # 加载日志函数
-      source "${LOCAL_PATH}/log.sh";
+        echo -e "$CONF_FILE is \033[31mNot Found.\033[0m"
     fi
 }
 
 NotRootOut;
-ReadConf
-ReadLogf;
-LOG_INFO "Load Configure Done.\n"
+ReadConf "Global.conf";
+ReadConf "$(basename $0 .sh).conf";
+ReadConf "log.sh";
+LOG_INFO "Load Configures Done.\n"
 
-############### Template Version 0.1.0 ##############
+############### Template Version 0.1.2 ##############
 #####################################################
 # Function of Install cacticn
 #####################################################
 # Version : 0.0.1
 # Make by Chernic.Y.Chen @ China
 # E-Mail : iamchernic@gmail.com
-# Date : 2014-7-31
-# v0.0.1(2014-7-31) : File Created
-# v0.1.0(2014-7-31) : Test SucessFull On VisualMachine
-# v0.1.1(2014-8-04) : Test SucessFull On 1.203
-
-LOG_INFO "Initial Variables enoD"
-    # Default Path:
-    # /usr/bin/mysql
-    # /usr/bin/php
-    # /usr/bin/snmpwalk
-    # /usr/bin/snmpget
-    # /usr/bin/snmpbulkwalk
-    # /usr/bin/snmpgetnext
-    # /usr/bin/rrdtool
-    MYSQL_PATH="$(dirname `which mysql`)"             # httpd 运行路径( MySQL 部署时决定 )
-    mysqlrootpwd="focustar"                           # MySQL 根用户密码( MySQL 部署时决定 )
-    PHP_PATH="$(dirname `which php`)"                 # PHP 运行路径( PHP 部署时决定 )
-    SNMPWALK_PATH="$(dirname `which snmpwalk`)"       # snmpwalk 运行路径( snmpwalk 部署时决定 )
-    SNMPGET_PATH="$(dirname `which snmpget`)"         # snmpget 运行路径( snmpget 部署时决定 )
-    SNMPBULK_PATH="$(dirname `which snmpbulkwalk`)"   # snmpbulkwalk 运行路径( snmpbulkwalk 部署时决定 )
-    SNMPGETTEXT_PATH="$(dirname `which snmpgetnext`)" # snmpgetnext 运行路径( snmpgetnext 部署时决定 )
-    RRDTOOL_PATH="$(dirname `which rrdtool`)"         # rrdtool 运行路径( rrdtool 部署时决定 )
-    TRUETYPE_PATH=/usr/share/fonts/ukai.ttc           # RRDTool 默认字体路径
-    
-    CACTI_LINK=/var/www/html/cacticn  # httpd 站点主目录( httpd部署时决定, 末尾不带 "/" )
-    CACTI_PATH=/var/www               # Cacti 主目录名称( 可更改, 末尾不带 "/" )
-    CACTI_VSIN="cacti-0.8.7e-cn-utf8" # Cacti 压缩文件名( 暂时只支持该版本)
-    CACTI_DBTY="mysql"                # Cacti 数据库类型( 暂时只支持MySQL )
-    CACTI_DABS="cacticn"              # Cacti 数据库名称( 可更改, 未测试 )
-    CACTI_NAME="cacticn"              # Cacti 访问用户名( 可更改, 未测试 )
-    CACTI_PSWD="cacticn"              # Cacti 用户的密码( 可更改, 未测试 )
-    CACTI_UFT8="utf8"                 # Cacti 数据库字符类型( uft8 <推荐> 或者 gd2312 或 Others)
-
-LOG_INFO "Initial Variables Done\n"
-
+# Date : 2014-07-31
+# v0.0.1(2014-07-31) : File Created
+# v0.1.0(2014-07-31) : Test SucessFull On VisualMachine
+# v0.1.1(2014-08-04) : Test SucessFull On 1.203
+# v0.1.2(2014-08-05) : Use Gobal Conf
+# v0.1.3(2014-08-05) : Default Conf Comes and Default MySQL later.
 
 LOG_INFO "Stop Services enoD"
 	service crond stop  # 关闭计划会有影响
@@ -103,7 +67,6 @@ LOG_INFO "Stop Services Done\n"
 
 
 LOG_INFO "Install NET-SNMP for Cacti enoD"
-
 yum -y install net-snmp*
 if [ -e /etc/snmp/snmpd.conf ];
 then
@@ -183,10 +146,14 @@ LOG_INFO "Create DataBase Cacti of MySQL Done\n"
 
 
 LOG_INFO "Import Cacti Data to MySQL enoD"
-    # 当我们导入数据的时候可能会出错
-    # 有可能是因为我们安装的mysql是高版本的
-    # 并不支持TYPE=MyISAM,需要改成ENGINE=MyISAM这样就好了
-    sed -i 's@TYPE=MyISAM@@g' $CACTI_LINK/cacti.sql
+	# 这里安放 Default SQL 的函数
+	CONF_FILE=CactiDafaultSQL.sh
+    if [ -f $LOCAL_PATH/$CONF_FILE ];then
+        echo -e "$CONF_FILE is \033[32mFound.\033[0m"
+        . $LOCAL_PATH/$CONF_FILE
+    else
+        echo -e "$CONF_FILE is \033[31mNot Found.\033[0m"
+    fi
     $MYSQL_PATH/mysql -uroot -p$mysqlrootpwd $CACTI_DABS < $CACTI_LINK/cacti.sql
 LOG_INFO "Import Cacti Data to MySQL Done\n"
 
@@ -214,23 +181,16 @@ LOG_INFO "Edited config.php/global.php in Cacti enoD"
 LOG_INFO "Edited global.php in Cacti Done\n"
 
 
-ChangePHP()
-{
-	FILE=$1     # "$PHP_DIR/global_settings.php"
-	BEGIN=$2    # "path_rrdtool_default_font"
-	ENDIN=$3    # "max_length"
-	CONTENT=$4  # "/usr/share/fonts/ukai.ttc"
-		# 定位 path_rrdtool_default_font 段到 max_length 段的字符串
-		ss=$(grep -n $BEGIN $FILE | cut -d ':' -f 1)
-		# 重复 max_length 段的格式
-		sed -i $ss',/'$ENDIN'/ s/^.*'$ENDIN'.*$/&\n&/' $FILE
-		# 修改 新增的 max_length 段
-		sed -i $ss',/'$ENDIN'/ s:"'$ENDIN'.*$:"default" => "'$CONTENT'",:' $FILE
-}
-LOG_INFO "Edited config.php/global.php in Cacti enoD"
-	sed -i 's@"default" => "Version 1",@"default" => "版本 2",@g' $CACTI_LINK/include/global_settings.php
-	ChangePHP "$CACTI_LINK/include/global_settings.php"  "path_rrdtool_default_font"  "max_length"  "$TRUETYPE_PATH"
-LOG_INFO "Edited global.php in Cacti Done\n"
+LOG_INFO "Edited Default Configure in Cacti enoD"
+	# 这里安放 Default Configure 的函数
+	CONF_FILE=CactiDafaultConf.sh
+    if [ -f $LOCAL_PATH/$CONF_FILE ];then
+        echo -e "$CONF_FILE is \033[32mFound.\033[0m"
+        . $LOCAL_PATH/$CONF_FILE
+    else
+        echo -e "$CONF_FILE is \033[31mNot Found.\033[0m"
+    fi
+LOG_INFO "Edited Default Configure in Cacti Done\n"
 
 
 LOG_INFO "Chown Right Of log And rra enoD"
