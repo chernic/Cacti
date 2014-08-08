@@ -52,36 +52,32 @@ LOG_INFO "Load Configures Done.\n"
 # Date : 2014-08-05
 # v0.0.1(2014-08-05) : File Created
 
-ChangeSQL()
+SqlConf3_1()
 {
-    FILE=$1     # "$PHP_DIR/global_settings.php"
-    BEGIN=$2    # "path_rrdtool_default_font"
-    NEWADD=$3   # "default"
-    CONTENT=$4  # "/usr/share/fonts/ukai.ttc"
-        # 定位 path_rrdtool_default_font 段到 max_length 段的字符串
-        ss=$(grep -n \"$BEGIN\" $FILE | cut -d ':' -f 1)
-        # 判断 "default" 段是否存在
-        ct="`sed -n $ss',/)/  s:"'$NEWADD'".*$:&:p' $FILE`"
-        if [ -z "$ct" ]; then
-            echo "\"$BEGIN\" <\"$NEWADD\"> Not Exited. Insert it."
-            # 重复 \"method\" 段的格式
-            sed -i $ss',/)/ s/^.*\"method\".*$/&,\n&/' $FILE                                   # 非尾有逗号
-            # 基于 method 段新增 $NEWADD 段
-            sed -i $ss',/\"method\"/ s:\"method\".*$:\"'$NEWADD'\" => \"'$CONTENT'\",:' $FILE  # 末尾无逗号
-        else
-            echo "\"$BEGIN\" <\"$NEWADD\"> Exited. Change it."
-            # 直接修改原有 \"'$NEWADD'\" 段
-            sed -i $ss',/)/ s:\"'$NEWADD'\".*$:\"'$NEWADD'\" => \"'$CONTENT'\",:' $FILE        # 末尾无逗号
-        fi
-}
+	FILE=$1       # 文件名称
+	START=$2      # 开始标志
+	ADDFLG=$3     # 分割标志
+	CONTENT=$4    # 更改内容
+	ADDWHERE=$5   # 第几段内容
+		TARGET='\([^'$ADDFLG']*\)'$ADDFLG
+		BEFORE=''
+		for((i=1;i<=$ADDWHERE;i++));
+		do 
+			TARGET=$TARGET'\([^'$ADDFLG']*\)'$ADDFLG
+			BEFORE=$BEFORE'\\('$i'\),'
+		done
+		#echo $TARGET # TARGET='\([^,]*\),\([^,]*\),\([^,]*\),\([^,]*\),\([^,]*\),\([^,]*\),\([^,]*\),'
+		#echo $BEFORE # BEFORE='\1,\2,\3,\4,\5,\6,'
+		sed -i "/$START/{
+		s@$START.*@$START (1, 8, '本机', '127.0.0.1', '', 'public', 2, '', '', 'MD5', '', 'DES', '', 161, 500, 2, 3, 23, 400, 1, 10, '', 0, 0, '0000-00-00 00:00:00', '0000-00-00 00:00:00', '', 9.99999, 0.00000, 0.00000, 0.00000, 0, 0, 100.00000);@
+		}" $FILE
+		# sed -i "/$START/{
+		# s@$TARGET@$BEFORE $CONTENT,@
+		# }" $FILE
+		sed -n "/$START/p" $FILE
+} 
 
-SqlConfHost()
-{
-    CH_FILE="$CACTI_LINK/include/global_settings.php"
-    ChangeSQL2_4 $CH_FILE "log_destination"        "default" "1"       # 日志文件目的地
-}
-
-# 当我们导入数据的时候可能会出错
-# 有可能是因为我们安装的mysql是高版本的
-# 并不支持TYPE=MyISAM,需要改成ENGINE=MyISAM这样就好了
-sed -i 's@TYPE=MyISAM@@g' $CACTI_LINK/cacti.sql
+sed -i 's@TYPE=MyISAM@ENGINE=MyISAM@g' $CACTI_LINK/cacti.sql
+# sed -i "s@^INSERT INTO \`host\` VALUES.*@INSERT INTO \`host\` VALUES (1, 8, '本机', '127.0.0.1', '', 'public', 2, '', '', 'MD5', '', 'DES', '', 161, 500, 2, 3, 23, 400, 1, 10, '', 0, 0, '0000-00-00 00:00:00', '0000-00-00 00:00:00', '', 9.99999, 0.00000, 0.00000, 0.00000, 0, 0, 100.00000);@
+# }"
+# SqlConf3_1 "$CACTI_LINK/cacti.sql"  "INSERT INTO \`host\` VALUES"  ","  2  6 

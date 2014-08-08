@@ -207,8 +207,8 @@ PhpConfPoller()
     ChangePHP2_5 $CP_FILE "script_timeout"              "default" "25"              # 脚本和脚本服务程序的超时值
     ChangePHP2_5 $CP_FILE "max_get_size"                "default" "10"              # 每SNMP获取请求的最大OID's数量
     # 设备可用性设置
-    ChangePHP2_5 $CP_FILE "availability_method"         "default" "AVAIL_SNMP"      # 离线设备检测
-    ChangePHP2_5 $CP_FILE "ping_method"                 "default" "PING_UDP"        # Ping类型
+    ChangePHP2_5 $CP_FILE "availability_method"         "default" "2"      			# 离线设备检测:Ping&SNMP
+    ChangePHP2_5 $CP_FILE "ping_method"                 "default" "3"        		# Ping类型:PING_UDP
     ChangePHP2_5 $CP_FILE "ping_port"                   "default" "23"              # Ping端口
     ChangePHP2_5 $CP_FILE "ping_timeout"                "default" "400"             # Ping超时值
     ChangePHP2_5 $CP_FILE "ping_retries"                "default" "1"               # Ping重试计数
