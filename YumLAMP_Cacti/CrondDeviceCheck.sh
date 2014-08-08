@@ -67,7 +67,7 @@ NotRootOut;
 
 DB_user="cacticn"		         # 数据库用户 : 默认 cacticn
 DB_pswd="cacticn"		         # 数据库密码 : 默认 cacticn
-PHP_PATH="/usr/bin/"             # PHP程序路径
+PHP_PATH="/usr/bin"             # PHP程序路径
 CHK_PATH=`pwd`                   # "/usr/share/cacti/"
 CLI_PATH="/var/www/html/cacticn" # Cacti
 
@@ -152,10 +152,10 @@ do
 		# $PHP_PATH/php -q $CLI_PATH/cli/add_graphs.php --host-id=$ID --graph-type=cg --graph-template-id=21
 
 		# 执行:添加硬盘(先查询)
-		Disk=`/usr/bin/php -q /usr/share/cacti/cli/add_graphs.php --host-id=$ID --snmp-field=dskDevice --list-snmp-values | grep -v "Known"`
+		Disk=`$PHP_PATH/php -q $CLI_PATH/cli/add_graphs.php --host-id=$ID --snmp-field=dskDevice --list-snmp-values | grep -v "Known"`
 		for i in $Disk
 		do
-			/usr/bin/php php -q /usr/share/cacti/cli/add_graphs.php --host-id=$ID --graph-type=ds --graph-template-id=21 --snmp-query-id=6 --snmp-query-type-id=15 --snmp-field=dskDevice --snmp-value=$i
+			$PHP_PATH/php -q $CLI_PATH/cli/add_graphs.php --host-id=$ID --graph-type=ds --graph-template-id=21 --snmp-query-id=6 --snmp-query-type-id=15 --snmp-field=dskDevice --snmp-value=$i
 		done
 	
 	# 执行:添加树
