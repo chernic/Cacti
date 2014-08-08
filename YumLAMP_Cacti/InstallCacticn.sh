@@ -55,6 +55,8 @@ LOG_INFO "Load Configures Done.\n"
 # v0.1.1(2014-08-04) : Test SucessFull On 1.203
 # v0.1.2(2014-08-05) : Use Gobal Conf
 # v0.1.3(2014-08-05) : Default Conf Comes and Default MySQL later.
+# v0.1.4(2014-08-08) : Install Support Crond Check
+
 
 LOG_INFO "Stop Services enoD"
 	service crond stop  # 关闭计划会有影响
@@ -158,7 +160,7 @@ LOG_INFO "Import Cacti Data to MySQL enoD"
 LOG_INFO "Import Cacti Data to MySQL Done\n"
 
 
-LOG_INFO "Edited config.php/global.php in Cacti enoD"
+LOG_INFO "Edited Default Configure in Cacti enoD"
     # 修改 $CACTI_LINK/include/config.php
     sed -i 's@^$database_type.*@$database_type = "mysql";@g' $CACTI_LINK/include/config.php
     sed -i 's@^$database_default.*@$database_default = "'$CACTI_DABS'";@g' $CACTI_LINK/include/config.php
@@ -178,10 +180,7 @@ LOG_INFO "Edited config.php/global.php in Cacti enoD"
     sed -i 's@^$database_port.*@$database_port = "3306";@g' $CACTI_LINK/include/global.php
     sed -i 's@^$database_ssl.*@$database_ssl = "false";@g' $CACTI_LINK/include/global.php
     sed -i 's@^//$url_path@$url_path@g' $CACTI_LINK/include/global.php
-LOG_INFO "Edited global.php in Cacti Done\n"
 
-
-LOG_INFO "Edited Default Configure in Cacti enoD"
 	# 这里安放 Default Configure 的函数
 	CONF_FILE=CactiDafaultConf.sh
     if [ -f $LOCAL_PATH/$CONF_FILE ];then
@@ -191,12 +190,6 @@ LOG_INFO "Edited Default Configure in Cacti enoD"
         echo -e "$CONF_FILE is \033[31mNot Found.\033[0m"
     fi
 LOG_INFO "Edited Default Configure in Cacti Done\n"
-
-
-LOG_INFO "Chown Right Of log And rra enoD"
-    # 赋予权限给rra/ log/
-    chown -vR $CACTI_NAME:$CACTI_NAME $CACTI_LINK/{rra,log}
-LOG_INFO "Chown Right Of log And rra Done\n"
     
     
 LOG_INFO "Install Character enoD"
@@ -222,7 +215,36 @@ LOG_INFO "Add Crond enoD"
     if [ "" == "`grep "$CACTI_NAME $PHP_PATH/php $CACTI_LINK/poller.php > $CACTI_LINK/log/pooler-error.log" /etc/crontab`" ];then
         echo "*/5 * * * * $CACTI_NAME $PHP_PATH/php $CACTI_LINK/poller.php > $CACTI_LINK/log/pooler-error.log" >> /etc/crontab
     fi
+	
+	cp $LOCAL_PATH/CrondDeviceCheck.sh $CACTI_LINK/CrondDeviceCheck.sh
+	# for Test
+	cp $LOCAL_PATH/cacti_clients $CACTI_LINK/cacti_clients	
+	
+	sed -i 's@^NotRootOut;$@#NotRootOut;@'            $CACTI_LINK/CrondDeviceCheck.sh
+	sed -i 's@^PHP_PATH=.*$@PHP_PATH='$PHP_PATH'@' 	   $CACTI_LINK/CrondDeviceCheck.sh
+	sed -i 's@^CHK_PATH=.*$@CHK_PATH='$CACTI_LINK'@'   $CACTI_LINK/CrondDeviceCheck.sh
+	sed -i 's@^CLI_PATH=.*$@CLI_PATH='$CACTI_LINK'@'   $CACTI_LINK/CrondDeviceCheck.sh
+
+	sed -n '/NotRootOut;/p' $CACTI_LINK/CrondDeviceCheck.sh
+	sed -n '/^PHP_PATH/p' $CACTI_LINK/CrondDeviceCheck.sh
+	sed -n '/^CHK_PATH/p' $CACTI_LINK/CrondDeviceCheck.sh
+	sed -n '/^CLI_PATH/p' $CACTI_LINK/CrondDeviceCheck.sh
+	chmod +x $CACTI_LINK/CrondDeviceCheck.sh
+	
+	# sed -i 's@^NotRootOut=.*$@#NotRootOut@'            ./CrondDeviceCheck.sh;sed -n '/^NotRootOut/p' ./CrondDeviceCheck.sh
+	# Now $CACTI_NAME to Run
+    if [ "" == "`grep "$CACTI_NAME /bin/sh $CACTI_LINK/CrondDeviceCheck.sh > $CACTI_LINK/log/CrondDeviceCheck.log" /etc/crontab`" ];then
+        echo "*/5 * * * * $CACTI_NAME /bin/sh $CACTI_LINK/CrondDeviceCheck.sh > $CACTI_LINK/log/CrondDeviceCheck.log" >> /etc/crontab
+    fi
+	
 LOG_INFO "Add Crond Done\n"
+
+
+LOG_INFO "Chown Right Of log And rra enoD"
+    # 赋予权限给rra/ log/
+    chown -vR $CACTI_NAME:$CACTI_NAME $CACTI_LINK/{rra,log}
+    #chown -v $CACTI_NAME:$CACTI_NAME $CACTI_LINK/CrondDeviceCheck.sh
+LOG_INFO "Chown Right Of log And rra Done\n"
 
 
 LOG_INFO "Restart Server enoD"
@@ -247,6 +269,7 @@ LOG_INFO "Configure FireWall enoD"
 LOG_INFO "Configure FireWall enoD\n"
 LOG_INFO "Auto Start enoD"
     if [ "enabled" == "$CHK_CONFIG" ];then
+		LOG_INFO "Service will AutoStart Will Power on."
 		chkconfig httpd on
 		chkconfig snmpd on
 		chkconfig crond on
