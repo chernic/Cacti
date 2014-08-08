@@ -212,38 +212,34 @@ LOG_INFO "Install Character Done\n"
 
 LOG_INFO "Add Crond enoD"
     # 检索/etc/crontab, 若不存在 "本次新规则" 才添加
-    if [ "" == "`grep "$CACTI_NAME $PHP_PATH/php $CACTI_LINK/poller.php > $CACTI_LINK/log/pooler-error.log" /etc/crontab`" ];then
-        echo "*/5 * * * * $CACTI_NAME $PHP_PATH/php $CACTI_LINK/poller.php > $CACTI_LINK/log/pooler-error.log" >> /etc/crontab
-    fi
+	# cacticn 执行
+	if [ "" == "`grep "$CACTI_NAME $PHP_PATH/php $CACTI_LINK/poller.php > $CACTI_LINK/log/pooler-error.log" /etc/crontab`" ];then
+		echo "*/5 * * * * $CACTI_NAME $PHP_PATH/php $CACTI_LINK/poller.php > $CACTI_LINK/log/pooler-error.log" >> /etc/crontab
+	fi
+	# cacticn 执行
+	if [ "" == "`grep "$CACTI_NAME /bin/sh $CACTI_LINK/CrondDeviceCheck.sh > $CACTI_LINK/log/CrondDeviceCheck.log" /etc/crontab`" ];then
+		echo "*/5 * * * * $CACTI_NAME /bin/sh $CACTI_LINK/CrondDeviceCheck.sh > $CACTI_LINK/log/CrondDeviceCheck.log" >> /etc/crontab
+	fi	
 	
-	cp $LOCAL_PATH/CrondDeviceCheck.sh $CACTI_LINK/CrondDeviceCheck.sh
-	# for Test
-	cp $LOCAL_PATH/cacti_clients $CACTI_LINK/cacti_clients	
-	
-	sed -i 's@^NotRootOut;$@#NotRootOut;@'            $CACTI_LINK/CrondDeviceCheck.sh
+	cp -vf $LOCAL_PATH/cactiroot/*   $CACTI_LINK/
+	# chmod -v +x $CACTI_LINK/CrondDeviceCheck.sh	
+	sed -i 's@^NotRootOut;$@#NotRootOut;@'             $CACTI_LINK/CrondDeviceCheck.sh
 	sed -i 's@^PHP_PATH=.*$@PHP_PATH='$PHP_PATH'@' 	   $CACTI_LINK/CrondDeviceCheck.sh
 	sed -i 's@^CHK_PATH=.*$@CHK_PATH='$CACTI_LINK'@'   $CACTI_LINK/CrondDeviceCheck.sh
 	sed -i 's@^CLI_PATH=.*$@CLI_PATH='$CACTI_LINK'@'   $CACTI_LINK/CrondDeviceCheck.sh
 
 	sed -n '/NotRootOut;/p' $CACTI_LINK/CrondDeviceCheck.sh
-	sed -n '/^PHP_PATH/p' $CACTI_LINK/CrondDeviceCheck.sh
-	sed -n '/^CHK_PATH/p' $CACTI_LINK/CrondDeviceCheck.sh
-	sed -n '/^CLI_PATH/p' $CACTI_LINK/CrondDeviceCheck.sh
-	chmod +x $CACTI_LINK/CrondDeviceCheck.sh
-	
-	# sed -i 's@^NotRootOut=.*$@#NotRootOut@'            ./CrondDeviceCheck.sh;sed -n '/^NotRootOut/p' ./CrondDeviceCheck.sh
-	# Now $CACTI_NAME to Run
-    if [ "" == "`grep "$CACTI_NAME /bin/sh $CACTI_LINK/CrondDeviceCheck.sh > $CACTI_LINK/log/CrondDeviceCheck.log" /etc/crontab`" ];then
-        echo "*/5 * * * * $CACTI_NAME /bin/sh $CACTI_LINK/CrondDeviceCheck.sh > $CACTI_LINK/log/CrondDeviceCheck.log" >> /etc/crontab
-    fi
-	
+	sed -n '/^PHP_PATH/p'   $CACTI_LINK/CrondDeviceCheck.sh
+	sed -n '/^CHK_PATH/p'   $CACTI_LINK/CrondDeviceCheck.sh
+	sed -n '/^CLI_PATH/p'   $CACTI_LINK/CrondDeviceCheck.sh
+
 LOG_INFO "Add Crond Done\n"
 
 
 LOG_INFO "Chown Right Of log And rra enoD"
     # 赋予权限给rra/ log/
     chown -vR $CACTI_NAME:$CACTI_NAME $CACTI_LINK/{rra,log}
-    #chown -v $CACTI_NAME:$CACTI_NAME $CACTI_LINK/CrondDeviceCheck.sh
+	chmod -v +x $CACTI_LINK/CrondDeviceCheck.sh	
 LOG_INFO "Chown Right Of log And rra Done\n"
 
 
