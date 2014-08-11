@@ -1,0 +1,11 @@
+<query>
+   <name>Example File</name>
+   <description>Queries a net-snmp host for a device I/O listing</description>
+   <comment>Get more Cacti graphs at http://www.rodre.com</comment>
+   <oid_index>.1.3.6.1.4.1.2021.13.15.1.1.1</oid_index>
+   <index_order>diskIODevice:diskIOIndex</index_order>
+   <index_order_type>numeric</index_order_type>
+   <index_title_format>|chosen_order_field|</index_title_format>
+   <fields>
+   </fields>
+</query>

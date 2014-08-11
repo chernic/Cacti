@@ -1,0 +1,8 @@
+diskIOIndex,index_of_diskIO,walk,value,input,.1.3.6.1.4.1.2021.13.15.1.1.1,UCD-SNMP-MIB,DISKIO,INTEGER,0
+diskIODevice,device_of_diskIO,walk,value,input,.1.3.6.1.4.1.2021.13.15.1.1.2,UCD-SNMP-MIB,DISKIO,STRING,1
+diskIONRead,Not_Read_of_diskIO,walk,value,input,.1.3.6.1.4.1.2021.13.15.1.1.3,UCD-SNMP-MIB,DISKIO,Counter32,2
+diskIONWritten,Not_Written_of_diskIO,walk,value,input,.1.3.6.1.4.1.2021.13.15.1.1.4,UCD-SNMP-MIB,DISKIO,Counter32,3
+diskIOReads,Reads_of_diskIO,walk,value,input,.1.3.6.1.4.1.2021.13.15.1.1.5,UCD-SNMP-MIB,DISKIO,Counter32,4
+diskIOWrites,Writes_of_diskIO,walk,value,input,.1.3.6.1.4.1.2021.13.15.1.1.6,UCD-SNMP-MIB,DISKIO,Counter32,5
+diskIONReadX,Not_ReadX_of_diskIO,walk,value,input,.1.3.6.1.4.1.2021.13.15.1.1.12,UCD-SNMP-MIB,DISKIO,Counter64,6
+diskIONWrittenX,Not_WrittenX_of_diskIO,walk,value,input,.1.3.6.1.4.1.2021.13.15.1.1.13,UCD-SNMP-MIB,DISKIO,Counter64,7
